@@ -26,11 +26,16 @@ We had two people presenting this, and it worked really nicely to have a back-an
     *	Open discussion - 
         *	What are cognitive services
         *   Ask the room - who has implemented, what are they, what do they think of them, how easy are they to use and access, are they flexible, are there options for customization?
-    *	Intro to Cognitive Services – 
-        *	Anna to start by leading discussion on why we might want to use cognitive services, and open discussion described above
-        *	Chris to give intro about some of them
-        *	Anna to talk a little more above the various cognitive services, homing in on the vision ones and computer vision
-        *	Chris to drill in to custom vision 
+    * Show https://azure.microsoft.com/en-us/services/cognitive-services/
+        * Adult content
+        * Image classification
+        * Face API
+        * Speech Translation
+        * Intentions analysis
+        * Speaker recognition
+        * LUIS
+        * Language recognition
+         
     *	Black box vs customizable
     *	Use cases for cognitive services
         *	Maybe poll the class
@@ -41,6 +46,8 @@ We had two people presenting this, and it worked really nicely to have a back-an
         *	Data collection
         *	Kiosk - Uber
         *	Accessibility – Seeing AI
+
+
 
 *   Lab 1.1 Setup [~20 minutes]
     *	Set up the lab 

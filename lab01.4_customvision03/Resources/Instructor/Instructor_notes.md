@@ -1,1 +1,0 @@
-Please refer to the instructor notes in lab01.2_customvision01
