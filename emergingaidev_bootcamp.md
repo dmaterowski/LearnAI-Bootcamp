@@ -58,14 +58,14 @@ Please note: This is a rough agenda, and the schedule is subject to change pendi
 
 We will also use a gitter forum for discussion. Please post comments and questions [here][gitter].
 
-[lab-cogsrvc-301]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-cogsrvc-301
-[lab-cogsrvc-321]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-cogsrvc-321
+[lab-cogsrvc-301]: https://dmaterowski.github.io/LearnAI-Bootcamp/lab01.1-computer_vision/0_README
+[lab-cogsrvc-321]: https://dmaterowski.github.io/LearnAI-Bootcamp/lab01.2_customvision01/0_README
 [lab-cogsrvc-322]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-cogsrvc-322
 [lab-cogsrvc-323]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-cogsrvc-323
-[lab-cogsrvc-341]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-cogsrvc-341
-[lab-azsearch-301]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-azsearch-301
-[lab-intelbot-301]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-intelbot-301
-[lab-intelbot-311]: https://aka.ms/LearnAI-EmergingAIDevBootcamp-intelbot-311
-[lab-intelbot-321]:https://aka.ms/LearnAI-EmergingAIDevBootcamp-intelbot-321
+[lab-cogsrvc-341]: https://dmaterowski.github.io/LearnAI-Bootcamp/lab01.5-luis/0_README
+[lab-azsearch-301]: https://dmaterowski.github.io/LearnAI-Bootcamp/lab02.1-azure_search/0_README
+[lab-intelbot-301]: https://dmaterowski.github.io/LearnAI-Bootcamp/lab02.2-building_bots/0_README
+[lab-intelbot-311]: https://azure.github.io/LearnAI-Bootcamp/lab02.3-logging_chat_conversations/0_README
+[lab-intelbot-321]:https://azure.github.io/LearnAI-Bootcamp/lab02.4-testing_bots/0_README
 [gitter]: https://gitter.im/LearnAI-Bootcamps
 
