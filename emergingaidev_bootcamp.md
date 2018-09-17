@@ -1,6 +1,6 @@
 # Welcome 
 
-Welcome to the first two days of the Learn AI Bootcamp. In these two days, we will focus on hands-on activities that develop proficiency in AI-oriented services such as Azure Bot Services, Azure Search, and Cognitive Services. These labs assume a introductory to intermediate knowledge of these services, and if this is not the case, then you should spend the time working through the pre-requisites.
+Welcome to the first two days of the Learn AI Bootcamp. In these two days, we will focus on hands-on activities that develop proficiency in AI-oriented services such as Azure Bot Services, Azure Search, and Cognitive Services. These labs assume an introductory to intermediate knowledge of these services, and if this is not the case, then you should spend the time working through the pre-requisites.
 
 # Goals
 
@@ -24,7 +24,7 @@ This workshop is meant for an AI Developer on Azure. Since this is only a short 
 
 Firstly, you should have some previous exposure to Visual Studio. We will be using it for everything we are building in the workshop, so you should be familiar with [how to use it](https://docs.microsoft.com/en-us/visualstudio/ide/visual-studio-ide) to create applications. Additionally, this is not a class where we teach you how to code or develop applications. We assume you have some familiarity with C# (intermediate level - you can learn [here](https://mva.microsoft.com/en-us/training-courses/c-fundamentals-for-absolute-beginners-16169?l=Lvld4EQIC_2706218949)), but you do not know how to implement solutions with Cognitive Services. 
 
-Secondly, you should have some experience developing bots with Microsoft's Bot Framework. We won't spend a lot of time discussing how to design them or how dialogs work. If you are not familiar with the Bot Framework, you should take [this Microsoft Virtual Academy course](https://mva.microsoft.com/en-us/training-courses/creating-bots-in-the-microsoft-bot-framework-using-c-17590#!) prior to attending the workshop.
+Secondly, you should have some experience developing bots with Microsoft's Bot Framework. We won't spend a lot of time discussing how to design them or how dialogs work. If you are not familiar with the Bot Framework, you should complete [this tutorial](https://docs.microsoft.com/en-us/azure/bot-service/dotnet/bot-builder-dotnet-sdk-quickstart?view=azure-bot-service-4.0) prior to attending the workshop.
 
 Thirdly, you should have experience with the portal and be able to create resources (and spend money) on Azure. We will not be providing Azure passes for this workshop.
 
@@ -48,6 +48,7 @@ Please note: This is a rough agenda, and the schedule is subject to change pendi
   - 13:30-14:00: [Lab 2.1: Developing Intelligent Applications with Azure Search][lab-azsearch-301]
   - 14:00-14:30: Introduction and Context for Bots
   - 14:30-15:00: [Lab 2.2: Bulding Intelligent Bots][lab-intelbot-301]
+  - 10:30-12: [Lab 2.2: Building Intelligent Bots][lab-intelbot-301]
   - 1-2:  [Lab 2.3: Log Chat Conversations in your Bot][lab-intelbot-311]
   - 2-3: [Lab 2.4: Testing your Bot][lab-intelbot-321]
   - 3-4: [Business Case II - Bots](./lab02.5-bootcamp_case_2/Case_Part2.md)

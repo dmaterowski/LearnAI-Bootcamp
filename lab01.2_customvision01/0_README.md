@@ -11,37 +11,11 @@ Custom Vision API.  
 **Prerequisites**
 -----------------
 
- 
-
 ### Platform requirements
 
 This example has been tested using the .NET Framework using [Visual Studio 2017,
 Community Edition](https://www.visualstudio.com/downloads/)
 
- 
-
-### Training client library
-
-You may need to install the client library depending on your settings within
-Visual Studio. The easiest way to get the training client library is to install
-the
-[Microsoft.Cognitive.CustomVision.Training](https://www.nuget.org/packages/Microsoft.Cognitive.CustomVision.Training/)
-package from nuget.
-
-You can install it through the Visual Studio Package manager. Access the package
-manager by navigating through:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tools -> Nuget Package Manager -> Package Manager Console
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In that Console, add the nuget with:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Install-Package Microsoft.Cognitive.CustomVision.Training -Version 1.0.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- 
 
 ### The Training API key
 
@@ -51,6 +25,8 @@ on <https://customvision.ai> are exposed through this library, allowing you to
 automate all aspects of the Custom Vision Service. You can obtain a key by
 creating a new project at <https://customvision.ai> and then clicking on the
 "setting" gear in the top right.
+
+> Note: Internet Explorer is not supported. We recommend using Edge, Firefox, or Chrome.
 
 ### The Images used for Training and Predicting
 
@@ -179,12 +155,13 @@ namespace CustomVision.Sample
 To create a new Custom Vision Service project, add the following code in the
 body of the `Main()` method after the call to `new TrainingApi().`
 
- 
+What method should you replace the _ with to create a new Custom Vision Service project?
 
+ 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Create a new project
 Console.WriteLine("Creating new project:");
-var project = trainingApi.CreateProject("My New Project");
+var project = trainingApi._("My New Project");
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  
@@ -192,12 +169,14 @@ var project = trainingApi.CreateProject("My New Project");
 ### Step 3: Add tags to your project
 
 To add tags to your project, insert the following code after the call to
-`CreateProject("My New Project");`.
+`("My New Project");`.
+
+What method should you replace the _ with to create a tag for Japanese Cherry?
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Make two tags in the new project
 var hemlockTag = trainingApi.CreateTag(project.Id, "Hemlock");
-var japaneseCherryTag = trainingApi.CreateTag(project.Id, "Japanese Cherry");
+var japaneseCherryTag = trainingApi._(project.Id, "Japanese Cherry");
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  
@@ -205,7 +184,7 @@ var japaneseCherryTag = trainingApi.CreateTag(project.Id, "Japanese Cherry");
 ### Step 4: Upload images to the project
 
 To add the images we have in memory to the project, insert the following code
-after the call to `CreateTag(project.Id, "Japanese Cherry")` method.
+after the call to `(project.Id, "Japanese Cherry")` method.
 
  
 
@@ -233,12 +212,14 @@ the following code after the end of code that you added in the prior step. This
 creates the first iteration in the project. We can then mark this iteration as
 the default iteration.
 
+What method should you replace the _ with to train the project? 
+
  
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Now there are images with tags start training the project
 Console.WriteLine("\tTraining");
-var iteration = trainingApi.TrainProject(project.Id);
+var iteration = trainingApi._(project.Id);
 
 // The returned iteration will be in progress, and can be queried periodically to see when it has completed
 while (iteration.Status == "Training")
@@ -293,6 +274,16 @@ Build and run the solution. You will be required to input your training API key
 into the console app when running the solution so have this at the ready. The
 training and prediction of the images can take 2 minutes. The prediction results
 appear on the console.
+
+### Need help?
+
+Start Visual Studio 2017, Community Edition, open the Visual Studio solution
+named **CustomVision.Sample.sln** in the solution sub-directory of where this lab is
+located:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Resources/Solution/CustomVision.Sample/CustomVision.Sample.sln
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Further Reading
 ---------------
