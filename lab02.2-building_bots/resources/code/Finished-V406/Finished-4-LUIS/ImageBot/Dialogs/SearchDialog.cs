@@ -1,16 +1,57 @@
-## 2_Azure_Search:
-Estimated Time: 10-15 minutes
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ImageBot.Responses;
+using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Schema;
+using PictureBot.Models;
 
-We now have a bot that can communicate with us if we use very specific words. The next thing we need to do is set up a connection to the Azure Search index we created in "lab02.1-azure_search." 
+namespace ImageBot.Dialogs
+{
+    public class SearchDialog : ComponentDialog
+    {
+        public const string DialogId = "searchPicture";
+        private const string SearchQueryPrompt = "searchQuery";
 
-### Lab 2.1: Update the bot to use Azure Search
+        public SearchDialog()
+            : base(DialogId)
+        {
+            InitialDialogId = Id;
 
-First, we need to update "SearchDialog.cs" so to request a search and process the response. We'll have to call Azure Search here, so make sure you've added the NuGet package (you should have done this in an earlier lab, but here's a friendly reminder).
+            AddDialog(new WaterfallDialog(
+                Id,
+                new WaterfallStep[]
+                {
+                    SearchDialogSteps.AskForSearchQueryAsync,
+                    SearchDialogSteps.SearchAsync,
+                }));
+            AddDialog(new TextPrompt(SearchQueryPrompt));
+        }
 
-![Azure Search NuGet](./resources/assets/AzureSearchNuGet.jpg) 
+        private static class SearchDialogSteps
+        {
+            public static async Task<DialogTurnResult> AskForSearchQueryAsync(
+                WaterfallStepContext stepContext,
+                CancellationToken cancellationToken)
+            {
+                await stepContext.PromptAsync(SearchQueryPrompt, new PromptOptions { Prompt = MessageFactory.Text("What would you like to search for?") }, cancellationToken);
+                return EndOfTurn;
+            }
 
-Open "SearchDialog.cs" and add azure search handling logic
-```csharp
+            public static async Task<DialogTurnResult> SearchAsync(
+               WaterfallStepContext stepContext,
+               CancellationToken cancellationToken)
+            {
+                await SearchResponses.ConfirmSearchAsync(stepContext.Context);
+                await SearchDialog.SearchAsync(stepContext.Context, stepContext.Result as string);
+                return await stepContext.EndDialogAsync();
+            }
+
+        }
+
         public static async Task SearchAsync(ITurnContext context, string searchText)
         {
             ISearchIndexClient indexClientForQueries = CreateSearchIndexClient();
@@ -46,30 +87,13 @@ Open "SearchDialog.cs" and add azure search handling logic
         {
             // Configure the search service and establish a connection, call it in StartAsync()
             // replace "YourSearchServiceName" and "YourSearchServiceKey" with your search service values
-            string searchServiceName = "YourSearchServiceName";
-            string queryApiKey = "YourSearchServiceKey";
-            string indexName = "images";
+            string searchServiceName = "[]";
+            string queryApiKey = "[]";
+            string indexName = "documentdb-index";
             // if you named your index "images" as instructed, you do not need to change this value
 
             SearchIndexClient indexClient = new SearchIndexClient(searchServiceName, indexName, new SearchCredentials(queryApiKey));
             return indexClient;
         }
-```
-
-Now, based on the RootDialog update your SearchDialog to ask user for search query and then call `SearchAsync`
-
-
-
-Set the value for the "YourSearchServiceName" to be the name of the Azure Search Service that you created earlier.  If needed, go back and look this up in the [Azure portal](https://portal.azure.com).  
-
-Set the value for the "YourSearchServiceKey" to be the key for this service.  This can be found in the [Azure portal](https://portal.azure.com) under the Keys section for your Azure Search.  In the below screenshot, the SearchServiceName would be "aiimmersionsearch" and the SearchServiceKey would be "375...".  
-
-![Azure Search Settings](./resources/assets/AzureSearchSettings.jpg) 
-
-Finally, the SearchIndexName should be "images," but you may want to confirm that this is what you named your index.  
-
-Press F5 to run your bot again.  In the Bot Emulator, try searching for something like "dogs" or "water".  Ensure that you are seeing results when tags from your pictures are requested.  
-
-
-### Continue to [3_LUIS](./3_LUIS.md)  
-Back to [README](./0_README.md)
+    }
+}
