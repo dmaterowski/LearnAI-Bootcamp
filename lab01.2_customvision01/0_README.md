@@ -56,217 +56,75 @@ located:
 Resources/Starter/CustomVision.Sample/CustomVision.Sample.sln
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This code defines and calls two helper methods. The method called
-`GetTrainingKey` prepares the training key. The one called `LoadImagesFromDisk`
-loads two sets of images that this example uses to train the project, and one
-test image that the example loads to demonstrate the use of the default
-prediction endpoint. On opening the project the following code should be
-displayed from line 35:
-
- 
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using Microsoft.Cognitive.CustomVision;
-
-namespace CustomVision.Sample
-{
-    class Program
-    {
-        private static List<MemoryStream> hemlockImages;
-
-        private static List<MemoryStream> japaneseCherryImages;
-
-        private static MemoryStream testImage;
-
-        static void Main(string[] args)
-        {
-            // You can either add your training key here, pass it on the command line, or type it in when the program runs
-            string trainingKey = GetTrainingKey("<your key here>", args);
-
-            // Create the Api, passing in a credentials object that contains the training key
-            TrainingApiCredentials trainingCredentials = new TrainingApiCredentials(trainingKey);
-            TrainingApi trainingApi = new TrainingApi(trainingCredentials);
-
-
-        }
-
-
-        private static string GetTrainingKey(string trainingKey, string[] args)
-        {
-            if (string.IsNullOrWhiteSpace(trainingKey) || trainingKey.Equals("<your key here>"))
-            {
-                if (args.Length >= 1)
-                {
-                    trainingKey = args[0];
-                }
-
-                while (string.IsNullOrWhiteSpace(trainingKey) || trainingKey.Length != 32)
-                {
-                    Console.Write("Enter your training key: ");
-                    trainingKey = Console.ReadLine();
-                }
-                Console.WriteLine();
-            }
-
-            return trainingKey;
-        }
-
-        private static string GetPredictionKey(string predictionKey, string[] args)
-        {
-            if (string.IsNullOrWhiteSpace(predictionKey) || predictionKey.Equals("<your key here>"))
-            {
-                if (args.Length >= 1)
-                {
-                    predictionKey = args[0];
-                }
-
-                while (string.IsNullOrWhiteSpace(predictionKey) || predictionKey.Length != 32)
-                {
-                    Console.Write("Enter your prediction key: ");
-                    predictionKey = Console.ReadLine();
-                }
-                Console.WriteLine();
-            }
-
-            return predictionKey;
-        }
-
-        private static void LoadImagesFromDisk()
-        {
-            // this loads the images to be uploaded from disk into memory
-            hemlockImages = Directory.GetFiles(@"..\..\..\..\Images\Hemlock").Select(f => new MemoryStream(File.ReadAllBytes(f))).ToList();
-            japaneseCherryImages = Directory.GetFiles(@"..\..\..\..\Images\Japanese Cherry").Select(f => new MemoryStream(File.ReadAllBytes(f))).ToList();
-            testImage = new MemoryStream(File.ReadAllBytes(@"..\..\..\..\Images\Test\test_image.jpg"));
-
-        }
-    }
-}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- 
+This code defines and calls one helper method called `LoadImagesFromDisk` which loads two sets of images that this example uses to train the project, and one test image that the example loads to demonstrate the use of the default
+prediction endpoint. 
 
 ### Step 2: Create a Custom Vision Service project
 
-To create a new Custom Vision Service project, add the following code in the
+To create a new Custom Vision Service project, add your code in the
 body of the `Main()` method after the call to `new TrainingApi().`
 
 What method should you replace the _ with to create a new Custom Vision Service project?
 
- 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Create a new project
-Console.WriteLine("Creating new project:");
-var project = trainingApi._("My New Project");
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+Project project = null; //TODO#1: Create new project
+
+```
 
  
 
 ### Step 3: Add tags to your project
 
-To add tags to your project, insert the following code after the call to
-`("My New Project");`.
+Implement the following part with creation of the tags.
 
-What method should you replace the _ with to create a tag for Japanese Cherry?
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Make two tags in the new project
-var hemlockTag = trainingApi.CreateTag(project.Id, "Hemlock");
-var japaneseCherryTag = trainingApi._(project.Id, "Japanese Cherry");
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+```
+//TODO#2: Make two tags in the new project
+Tag hemlockTag = null; //Create Tag "Hemlock";
+Tag japaneseCherryTag = null; //Create Tag "Japanese Cherry"
+```
  
 
 ### Step 4: Upload images to the project
 
-To add the images we have in memory to the project, insert the following code
-after the call to `(project.Id, "Japanese Cherry")` method.
-
- 
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Add some images to the tags
-Console.WriteLine("\tUploading images");
-LoadImagesFromDisk();
-
-// Images can be uploaded one at a time
+Upload the images to the project. Remember about using proper tags for each image category.
+You can either upload images one by one (TODO#3) or in batches (TODO#4).
+```
+//TODO#3: Images can be uploaded one at a time  
 foreach (var image in hemlockImages)
 {
-   trainingApi.CreateImagesFromData(project.Id, image, new List<string>() { hemlockTag.Id.ToString() });
+    //Add image to a project with a specific tag
 }
+```
 
-// Or uploaded in a single batch 
-trainingApi.CreateImagesFromData(project.Id, japaneseCherryImages, new List<Guid>() { japaneseCherryTag.Id });
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+ //TODO#4: Or uploaded in a single batch   
+ImageFileCreateBatch batch = null; //create a batch
+trainingApi.CreateImagesFromFilesWithHttpMessagesAsync(project.Id,batch).Wait();
 
- 
+```
 
 ### Step 5: Train the project
 
-Now that we have added tags and images to the project, we can train it. Insert
-the following code after the end of code that you added in the prior step. This
-creates the first iteration in the project. We can then mark this iteration as
-the default iteration.
-
 What method should you replace the _ with to train the project? 
-
- 
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Now there are images with tags start training the project
-Console.WriteLine("\tTraining");
+```
+//TODO#5: replace '_' below with a call to training method
 var iteration = trainingApi._(project.Id);
-
-// The returned iteration will be in progress, and can be queried periodically to see when it has completed
-while (iteration.Status == "Training")
-{
-    Thread.Sleep(1000);
-
-    // Re-query the iteration to get it's updated status
-    iteration = trainingApi.GetIteration(project.Id, iteration.Id);
-}
-
-// The iteration is now trained. Make it the default project endpoint
-iteration.IsDefault = true;
-trainingApi.UpdateIteration(project.Id, iteration.Id, iteration);
-Console.WriteLine("Done!\n");
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+```
 ### Step 6: Get and use the default prediction endpoint
 
 We are now ready to use the model for prediction. First we obtain the endpoint
-associated with the default iteration. Then we send a test image to the project
-using that endpoint. Insert the code after the training code you have just
-entered.
+associated with the default iteration. Then we send a test image to the project using that endpoint. 
 
- 
+### Step 6: Get predicted tag and its probability and print it
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Now there is a trained endpoint, it can be used to make a prediction
-
-// Add your prediction key from the settings page of the portal 
-// The prediction key is used in place of the training key when making predictions 
-string predictionKey = GetPredictionKey("<your key here>", args);
-
-// Create a prediction endpoint, passing in a prediction credentials object that contains the obtained prediction key  
-PredictionEndpointCredentials predictionEndpointCredentials = new PredictionEndpointCredentials(predictionKey);
-PredictionEndpoint endpoint = new PredictionEndpoint(predictionEndpointCredentials);
-// Make a prediction against the new project  
-Console.WriteLine("Making a prediction:");
-var result = endpoint.PredictImage(project.Id, testImage);
+Implmement TODO#6:
+```
 // Loop over each prediction and write out the results  
 foreach (var c in result.Predictions)
 {
-    Console.WriteLine($"\t{c.Tag}: {c.Probability:P1}");
+    //TODO#6: Display predicted tag and its probability in Console
 }
-Console.ReadKey();
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- 
+```
 
 ### Step 7: Run the example
 
