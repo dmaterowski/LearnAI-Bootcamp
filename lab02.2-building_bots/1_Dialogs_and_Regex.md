@@ -31,28 +31,9 @@ Select **OK**. You'll now see a template for a simple Echo Bot that can echo use
 
 Right-click on the solution in Solution Explorer and select "Manage NuGet Packages for Solution." Install all of the packages listed below (you may already have some of these and that is fine, you shouldn't need to reinstall or update them).  Make sure you check the box "Include prerelease" and are on the "Browse" tab. After you've installed them, under **Dependencies > NuGet** in your Solution Explorer, you should see the following packages:  
  
-* Microsoft.AspNetCore.All
-* Microsoft.Bot.Builder.Integration.AspNet.Core
-* Microsoft.Bot.Builder.Core
-* Microsoft.Bot.Builder.Dialogs  
-* Microsoft.Bot.Builder.Core.Extensions
-* Microsoft.Bot.Builder.AI.LUIS  
-* Microsoft.Azure.Search  
+* Microsoft.Bot.Builder.Dialogs 4.0.6
 
-We need to add some code to tell the app what to show us in the browser when we run it. Navigate to the html file called `default.htm` under the wwwroot folder, and replace the default contents with the following:
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-    <meta charset="utf-8" />
-</head>
-<body style="font-family:'Segoe UI'">
-    <h1>PictureBot</h1>
-    <p>Describe your bot here and your terms of use etc.</p>
-    </body>
-</html>
-```  
+
 
 Next, review the Startup.cs file. There are many comments within to help you understand what is happening. Spend a few minutes reading through.
 
@@ -75,23 +56,43 @@ Replace the ConfigureServices method with the following:
 // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddBot<PictureBot>(options =>
+            services.AddBot<PictureBot.PictureBot>(options =>
             {
                 options.CredentialProvider = new ConfigurationCredentialProvider(Configuration);
                 var middleware = options.Middleware;
 
-                // The Memory Storage used here is for local bot debugging only. When the bot
-                // is restarted, anything stored in memory will be gone. 
                 IStorage dataStore = new MemoryStorage();
 
-                // Add middleware below
-                middleware.Add(new UserState<UserData>(dataStore));
-                middleware.Add(new ConversationState<ConversationInfo>(dataStore));
-                // Add Regex ability below
+                var conversationState = new ConversationState(dataStore);
+                options.State.Add(conversationState);
 
+                var userState = new UserState(dataStore);
+                options.State.Add(userState);
 
-                // Add LUIS ability below
+            });
 
+            services.AddSingleton<PictureBotStateAccessors>(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
+                if (options == null)
+                {
+                    throw new InvalidOperationException("BotFrameworkOptions must be configured prior to setting up the state accessors");
+                }
+
+                var conversationState = options.State.OfType<ConversationState>().FirstOrDefault();
+                if (conversationState == null)
+                {
+                    throw new InvalidOperationException("ConversationState must be defined and added before adding conversation-scoped state accessors.");
+                }
+
+                // Create the custom state accessor.
+                // State accessors enable other components to read and write individual properties of state.
+                var accessors = new PictureBotStateAccessors(conversationState)
+                {
+                    GreetingState = conversationState.CreateProperty<GreetingState>(PictureBotStateAccessors.GreetingStateName),
+                };
+
+                return accessors;
             });
         }
 ```
@@ -101,27 +102,16 @@ You should see an error (red squiggly) beneath "PictureBot", "UserData", and "Co
 
 Delete the EchoBot.cs and EchoState.cs files. If you want to explore the EchoBot further, you can follow [this tutorial](https://docs.microsoft.com/en-us/azure/bot-service/dotnet/bot-builder-dotnet-sdk-quickstart?view=azure-bot-service-4.0) **later**.  
 
-Create a PictureState.cs class file. Update the file to this:
+Create a GreetingState.cs class file. Update the file to this:
 ```csharp
-using System.Collections.Generic;
-
-namespace PictureBot
+namespace ImageBot
 {
-    /// <summary>
-    /// Class for storing conversation data. 
-    /// </summary>
-    public class ConversationInfo : Dictionary<string, object> { }
-
-    /// <summary>
-    /// Class for storing user data in the conversation. 
-    /// </summary>
-    public class UserData
+    public class GreetingState
     {
-
         public string Greeted { get; set; } = "not greeted";
-
     }
 }
+
 ```
 
 Save the file. This is where we'll store information about the active conversation. You can see we're also keeping track of whether we've greeted the user, so we don't do it more than once. This should address our error in Startup.cs. Confirm this.  
@@ -137,13 +127,12 @@ namespace PictureBot
 {
     public class PictureBot : IBot
     {
-        public async Task OnTurn(ITurnContext context)
+       public async Task OnTurnAsync(ITurnContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (context.Activity.Type is ActivityTypes.Message)
             {
-                await context.SendActivity($"Hello world.");
+                await context.SendActivityAsync($"Hello world.");
             }
-
         }
     }
 }
@@ -155,7 +144,6 @@ Now start your bot (with or without debugging) by pressing the "IIS Express" but
 * Your default.htm page will be displayed in a browser.
 * Note the localhost port number for the page. You will need this information to interact with your bot.  
 
-Get stuck? You can find the solution for the lab up until this point under [resources/code/FinishedPictureBot-Part0](./resources/code/FinishedPictureBot-Part0).
 
 #### Using the Bot Framework Emulator  
 To interact with your bot:
@@ -173,6 +161,9 @@ You can read more about using the Emulator [here](https://docs.microsoft.com/en-
 Browse around and examine the sample bot code. In particular, note:
 + **Startup.cs** is where we will add services/middleware and configure the HTTP request pipeline.  
 + In **PictureBot.cs**, `OnTurn` is the entry point which waits for a message from the user, and `context.Activity.Type is ActivityTypes.Message` is where we can react to a message once received and wait for further messages.  We can use `context.SendActivity` to send a message from the bot back to the user.  
+
+#### Using state
+todo
 
 
 ### Lab 1.3: Organizing Code for Bots
