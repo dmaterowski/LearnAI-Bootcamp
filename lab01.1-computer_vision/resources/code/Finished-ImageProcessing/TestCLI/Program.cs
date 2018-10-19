@@ -4,11 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using ProcessingLibrary;
 using ImageStorageLibrary;
-using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
+using ProcessingLibrary;
 using ServiceHelpers;
+using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.FileExtensions;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace TestCLI
 {
@@ -19,18 +22,14 @@ namespace TestCLI
             var app = new CommandLineApplication(throwOnUnexpectedArg: false);
             var forceUpdate = app.Option("-force", "Use to force update even if file has already been added.",
                 CommandOptionType.NoValue);
-            var settingsFile = app.Option("-settings",
-                "The settings file (optional, will use embedded resource settings.json if not set)",
-                CommandOptionType.SingleValue);
             var dirs = app.Option("-process", "The directory to process", CommandOptionType.MultipleValue);
             var q = app.Option("-query", "The query to run", CommandOptionType.SingleValue);
             app.HelpOption("-? | -h | --help");
             app.OnExecute(() =>
             {
-                string settings = settingsFile.HasValue() ? settingsFile.Value() : null;
                 if (dirs != null && dirs.Values.Any())
                 {
-                    InitializeAsync(settings).Wait();
+                    InitializeAsync().Wait();
                     foreach (var dir in dirs.Values)
                     {
                         ProcessDirectoryAsync(dir, forceUpdate.HasValue()).Wait();
@@ -39,11 +38,11 @@ namespace TestCLI
                 }
                 else if (q != null && q.HasValue())
                 {
-                    InitializeAsync(settings).Wait();
+                    InitializeAsync().Wait();
                     RunQuery(q.Value());
                     return 0;
                 }
-                else 
+                else
                 {
                     app.ShowHelp("Must provide a directory to process");
                     return -1;
@@ -58,27 +57,20 @@ namespace TestCLI
 
         private static async Task InitializeAsync(string settingsFile = null)
         {
-            using (Stream settingsStream = settingsFile == null
-                ? Assembly.GetExecutingAssembly().GetManifestResourceStream("TestCLI.settings.json")
-                : new FileStream(settingsFile, FileMode.Open, FileAccess.Read))
-            using (var settingsReader = new StreamReader(settingsStream))
-            using (var textReader = new JsonTextReader(settingsReader))
-            {
-                dynamic settings = new JsonSerializer().Deserialize(textReader);
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .Build();
+            VisionServiceHelper.ApiKey = config.GetSection("CognitiveServicesKeys")["Vision"];
+            VisionServiceHelper.Endpoint = config.GetSection("CognitiveServicesKeys")["Endpoint"];
+            BlobStorageHelper.ConnectionString = config.GetSection("AzureStorage")["ConnectionString"];
+            BlobStorageHelper.ContainerName = config.GetSection("AzureStorage")["BlobContainer"];
+            blobStorage = await BlobStorageHelper.BuildAsync();
 
-
-                VisionServiceHelper.ApiKey = settings.CognitiveServicesKeys.Vision;
-
-                BlobStorageHelper.ConnectionString = settings.AzureStorage.ConnectionString;
-                BlobStorageHelper.ContainerName = settings.AzureStorage.BlobContainer;
-                blobStorage = await BlobStorageHelper.BuildAsync();
-
-                CosmosDBHelper.AccessKey = settings.CosmosDB.Key;
-                CosmosDBHelper.EndpointUri = settings.CosmosDB.EndpointURI;
-                CosmosDBHelper.DatabaseName = settings.CosmosDB.DatabaseName;
-                CosmosDBHelper.CollectionName = settings.CosmosDB.CollectionName;
-                cosmosDb = await CosmosDBHelper.BuildAsync();
-            }
+            CosmosDBHelper.AccessKey = config.GetSection("CosmosDB")["Key"];
+            CosmosDBHelper.EndpointUri = config.GetSection("CosmosDB")["EndpointURI"];
+            CosmosDBHelper.DatabaseName = config.GetSection("CosmosDB")["DatabaseName"];
+            CosmosDBHelper.CollectionName = config.GetSection("CosmosDB")["CollectionName"];
+            cosmosDb = await CosmosDBHelper.BuildAsync();
         }
 
         private static async Task ProcessDirectoryAsync(string dir, bool forceUpdate = false)
@@ -92,7 +84,7 @@ namespace TestCLI
                 ".jpeg",
                 ".gif"
             };
-            foreach (var file in 
+            foreach (var file in
                 from file in Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories)
                 where imageExtensions.Contains(Path.GetExtension(file))
                 select file)
@@ -106,7 +98,7 @@ namespace TestCLI
                         Console.WriteLine($"Processing {file}");
                         // Resize (if needed) in order to reduce network latency and errors due to large files. Then store the result in a temporary file.
                         var resized = Util.ResizeIfRequired(file, 750);
-                        Func<Task<Stream>> imageCB = async () => File.OpenRead(resized.Item2);
+                        Func<Task<Stream>> imageCB = async () => await Task.FromResult(File.OpenRead(resized.Item2));
                         ImageInsights insights = await ImageProcessor.ProcessImageAsync(imageCB, fileName);
                         Console.WriteLine($"Insights: {JsonConvert.SerializeObject(insights, Formatting.None)}");
                         var imageBlob = await blobStorage.UploadImageAsync(imageCB, fileName);
