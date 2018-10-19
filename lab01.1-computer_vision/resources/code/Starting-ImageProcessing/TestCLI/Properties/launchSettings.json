@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "-process c:\\proj\\ai-workshop\\LearnAI-Bootcamp\\lab01.1-computer_vision\\resources\\sample_images\\ -force"
+    }
+  }
+}
