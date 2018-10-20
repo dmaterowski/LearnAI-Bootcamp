@@ -28,13 +28,12 @@ Run _TestCLI_, then open Command Prompt and navigate to "C:\LearnAI-Bootcamp\lab
 
     Options:
     -force            Use to force update even if file has already been added.
-    -settings         The settings file (optional, will use embedded resource settings.json if not set)
     -process          The directory to process
     -query            The query to run
     -? | -h | --help  Show help information
 ```
 
-By default, it will load your settings from `settings.json` (it builds it into the `.exe`), but you can provide your own using the `-settings` flag. To load images (and their metadata from Cognitive Services) into your cloud storage, you can just tell _TestCLI_ to `-process` your image directory as follows:
+By default, it will load your settings from `appsettings.json`. To load images (and their metadata from Cognitive Services) into your cloud storage, you can just tell _TestCLI_ to `-process` your image directory as follows:
 
 ```
     > TestCLI.exe -process c:\learnai-bootcamp\lab01.1-computer_vision\resources\sample_images

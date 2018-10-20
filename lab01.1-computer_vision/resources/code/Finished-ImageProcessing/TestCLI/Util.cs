@@ -102,12 +102,5 @@ namespace TestCLI
                 }
             }
         }
-
-        /// <summary>
-        /// If we resize the image, we should resize the face rectangles in our insights appropriately.
-        /// </summary>
-        /// <param name="insights"></param>
-        /// <param name="resizeTransform"></param>
-
     }
 }

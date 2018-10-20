@@ -30,7 +30,7 @@ namespace ImageStorageLibrary
             helper.container = helper.blobClient.GetContainerReference(ContainerName);
             await helper.container.CreateIfNotExistsAsync();
             // Set permissions to allow people to access blobs _if they know they're there_. They can't list the container.
-            helper.container.SetPermissions(
+            await helper.container.SetPermissionsAsync(
                 new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
 
             return helper;

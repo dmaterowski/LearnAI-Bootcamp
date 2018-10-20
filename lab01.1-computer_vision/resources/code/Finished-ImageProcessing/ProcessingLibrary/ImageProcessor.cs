@@ -1,14 +1,16 @@
 ﻿// Below each "Step" there is code that should be entered
 // Corresponds to the Steps in the instructions for 2_ImageProcessor.md
 // Step 1: Add the using directives below:
+
+// Specify the namespace
+
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.ProjectOxford.Vision;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using ServiceHelpers;
 
-// Specify the namespace
 namespace ProcessingLibrary
 {
     // Specify the class
@@ -18,11 +20,14 @@ namespace ProcessingLibrary
         public static async Task<ImageInsights> ProcessImageAsync(Func<Task<Stream>> imageStreamCallback, string imageId)
         {
             // Step 3: Set up an array that we'll fill in over the course of the processor:
-            VisualFeature[] DefaultVisualFeaturesList = new VisualFeature[] { VisualFeature.Tags, VisualFeature.Description };
+            VisualFeatureTypes[] defaultVisualFeaturesList = { VisualFeatureTypes.Tags, VisualFeatureTypes.Description };
 
             // Step 4: Call the Computer Vision service and store the results in imageAnalysisResult:
-            var imageAnalysisResult = await VisionServiceHelper.AnalyzeImageAsync(imageStreamCallback, DefaultVisualFeaturesList);
+            var imageAnalysisResultOperation = await VisionServiceHelper.AnalyzeImageAsync(imageStreamCallback, defaultVisualFeaturesList);
 
+            if( !imageAnalysisResultOperation.Response.IsSuccessStatusCode)
+                throw new InvalidOperationException("Unable to analyze the image");
+            var imageAnalysisResult = imageAnalysisResultOperation.Body;
             // Step 5: Create an entry in ImageInsights:
             ImageInsights result = new ImageInsights
             {
@@ -34,7 +39,6 @@ namespace ProcessingLibrary
             // Step 6: Return results:
             return result;
         }
-
     }
 
 }
