@@ -412,11 +412,11 @@ namespace PictureBot.Responses
 
         public static async Task ReplyWithSearchConfirmation(ITurnContext context, string utterance)
         {
-            await context.SendActivity($"Ok, searching for pictures of {utterance}");
+            await context.SendActivityAsync($"Ok, searching for pictures of {utterance}");
         }
         public static async Task ReplyWithNoResults(ITurnContext context, string utterance)
         {
-            await context.SendActivity("There were no results found for \"" + utterance + "\".");
+            await context.SendActivityAsync("There were no results found for \"" + utterance + "\".");
         }
     }
 }

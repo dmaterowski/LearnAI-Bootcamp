@@ -7,7 +7,7 @@ We will have to update our bot in order to use LUIS.
 
 ### Lab 3.1: Adding LUIS to Startup.cs
 
-First, install Microsoft.Bot.Builder.AI.Luis 4.0.6 package
+First, install Microsoft.Bot.Builder.AI.Luis (4.2.0) package
 
 We are going to simplify the setup a bit and create a recognizer as a regular registered service. You can do that in `Startup.cs`
 with
@@ -31,7 +31,7 @@ Now we can inject `LuisRecognizer` in the bot constructor. Then we can call it i
 ```csharp
 var result = await _luisRecognizer.RecognizeAsync(context, cancellationToken);
 var topIntnet = result.GetTopScoringIntent();
-await RootResponses.ReplyWithLuisScoreAsync(context, topIntnet.intent, topIntnet.score);
+await RootResponses.ReplyWithLuisScore(context, topIntnet.intent, topIntnet.score);
 ```
 
 Run your bot and see if it works!
