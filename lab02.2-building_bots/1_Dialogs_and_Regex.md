@@ -12,9 +12,9 @@ We will be developing a bot using the latest .NET SDK (v4). To get started, we'l
 
 #### Download the Bot Framework Emulator
 
-You can download the v4 Preview Bot Framework Emulator for testing your bot locally. The instructions for the rest of the labs will assume you've downloaded the v4 Emulator (as opposed to the v3 Emulator). Download the emulator by going to [this page](https://github.com/Microsoft/BotFramework-Emulator/releases) and download the most recent version of the emulator (select the ".exe" file, if you are using windows).
+You can download the v4 Preview Bot Framework Emulator for testing your bot locally. The instructions for the rest of the labs will assume you've downloaded the v4 Emulator. Download the emulator by going to [this page](https://github.com/Microsoft/BotFramework-Emulator/releases) and download the most recent version of the emulator (select the ".exe" file, if you are using windows).
 
-The emulator installs to `c:\Users\`_your-username_`\AppData\Local\botframework\app-4.0.15\botframework-emulator.exe` or to your Downloads folder, depending on browser.
+The emulator installs to `c:\Users\`_your-username_`\AppData\Local\botframework\app-`_version_`\botframework-emulator.exe` or to your Downloads folder, depending on browser.
 
 #### Download the Bot Builder Template
 
@@ -22,7 +22,7 @@ Download the [Bot Builder SDK v4 Template for C# here](https://marketplace.visua
 
 ### Lab 1.2: Creating a simple bot and running it
 
-Open Visual Studio, and create a new project (select **File > New > Project**) and title it "PictureBot". Make sure to select the "Bot Builder Echo Bot" template and extension.
+Open Visual Studio, and create a new project (select **File > New > Project**) and title it "PictureBot". Make sure to select the "Echo Bot" template.
 
 ![New Project](./resources/assets/NewEchoBot.png)
 
@@ -32,7 +32,7 @@ Select **OK**. You'll now see a template for a simple Echo Bot that can echo use
 
 Right-click on the solution in Solution Explorer and select "Manage NuGet Packages for Solution." Install all of the packages listed below (you may already have some of these and that is fine, you shouldn't need to reinstall or update them). Make sure you check the box "Include prerelease" and are on the "Browse" tab. After you've installed them, under **Dependencies > NuGet** in your Solution Explorer, you should see the following packages:
 
-- Microsoft.Bot.Builder.Dialogs 4.0.6
+- Microsoft.Bot.Builder.Dialogs 4.2.0
 
 Next, review the Startup.cs file. There are many comments within to help you understand what is happening. Spend a few minutes reading through.
 
@@ -361,11 +361,11 @@ namespace PictureBot.Responses
         }
         public static async Task ReplyWithHelp(ITurnContext context)
         {
-            await context.SendActivity($"I can search for pictures, share pictures and order prints of pictures.");
+            await context.SendActivityAsync($"I can search for pictures, share pictures and order prints of pictures.");
         }
         public static async Task ReplyWithResumeTopic(ITurnContext context)
         {
-            await context.SendActivity($"What can I do for you?");
+            await context.SendActivityAsync($"What can I do for you?");
         }
         public static async Task ReplyWithConfused(ITurnContext context)
         {
@@ -374,15 +374,15 @@ namespace PictureBot.Responses
         }
         public static async Task ReplyWithLuisScore(ITurnContext context, string key, double score)
         {
-            await context.SendActivity($"Intent: {key} ({score}).");
+            await context.SendActivityAsync($"Intent: {key} ({score}).");
         }
         public static async Task ReplyWithShareConfirmation(ITurnContext context)
         {
-            await context.SendActivity($"Posting your picture(s) on twitter...");
+            await context.SendActivityAsync($"Posting your picture(s) on twitter...");
         }
         public static async Task ReplyWithOrderConfirmation(ITurnContext context)
         {
-            await context.SendActivity($"Ordering standard prints of your picture(s)...");
+            await context.SendActivityAsync($"Ordering standard prints of your picture(s)...");
         }
     }
 }
