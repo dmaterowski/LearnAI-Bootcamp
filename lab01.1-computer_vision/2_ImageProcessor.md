@@ -20,9 +20,9 @@ Let's talk about how we're going to call  Cognitive Services in our application.
 
 ### **Image Processing Library** ###
 
-Within your solution, under resources>code>Starting-ImageProcessing, you'll find the `Processing Library`. It serves as a wrapper around several services. This specific PCL contains some helper classes (in the ServiceHelpers folder) for accessing the Computer Vision API and an "ImageInsights" class to encapsulate the results. Later, we'll create an image processor class that will be responsible for wrapping an image and exposing several methods and properties that act as a bridge to the Cognitive Services. 
+Within your solution, under resources>code>Starting-ImageProcessing, you'll find the `Processing Library`. It serves as a wrapper around several services. This specific library contains some helper classes (in the ServiceHelpers folder) for accessing the Computer Vision API and an "ImageInsights" class to encapsulate the results. Later, we'll create an image processor class that will be responsible for wrapping an image and exposing several methods and properties that act as a bridge to the Cognitive Services. 
 
-![Processing Library PCL](./resources/assets/ProcessingLibrary.png)
+![Processing Library](./resources/assets/ProcessingLibrary.png)
 
 After creating the image processor (in Lab 2.1), you should be able to pick up this portable class library and drop it in your other projects that involve Cognitive Services (some modification will be required depending on which Cognitive Services you want to use). 
 
@@ -38,7 +38,7 @@ You can find additional service helpers for some of the other Cognitive Services
 
 Take a look at the "ImageInsights" class. You can see that we're calling for `Caption` and `Tags` from the images, as well as a unique `ImageId`. "ImageInsights" pieces only the information we want together from the Computer Vision API (or from Cognitive Services, if we choose to call multiple).
 
-Now let's take a step back for a minute. It isn't quite as simple as creating the "ImageInsights" class and copying over some methods/error handling from service helpers. We still have to call the API and process the images somewhere. For the purpose of this lab, we are going to walk through creating `ImageProcessor.cs`, but in future projects, feel free to add this class to your PCL and start from there (it will need modification depending what Cognitive Services you are calling and what you are processing - images, text, voice, etc.).
+Now let's take a step back for a minute. It isn't quite as simple as creating the "ImageInsights" class and copying over some methods/error handling from service helpers. We still have to call the API and process the images somewhere. For the purpose of this lab, we are going to walk through creating `ImageProcessor.cs`, but in future projects, feel free to add this class to your library and start from there (it will need modification depending what Cognitive Services you are calling and what you are processing - images, text, voice, etc.).
 
 
 
@@ -66,9 +66,7 @@ using ServiceHelpers;
 
 ```
 public static async Task<ImageInsights> ProcessImageAsync(Func<Task<Stream>> imageStreamCallback, string imageId)
-        {
-
-        
+        {  
 ```
 > Hint: Visual Studio will throw an error, due to the open bracket. Add what is necessary to the end of the method. Ask a neighbor if you need help.  
 

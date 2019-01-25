@@ -13,13 +13,13 @@ Custom Vision API.  
 
 ### Platform requirements
 
-This example has been tested using the .NET Framework using [Visual Studio 2017,
-Community Edition](https://www.visualstudio.com/downloads/)
+This example has been tested using the .NET Core 2.2 using [Visual Studio 2017,
+Professional Edition](https://www.visualstudio.com/downloads/)
 
 
 ### The Training API key
 
-You also need to have a training API key. The training API key allows you to
+You also need to have a training API key and url as well as prediction key and url. The keys allow you to
 create, manage, and train Custom Vision projects programatically. All operations
 on <https://customvision.ai> are exposed through this library, allowing you to
 automate all aspects of the Custom Vision Service. You can obtain a key by
@@ -99,7 +99,7 @@ foreach (var image in hemlockImages)
 ```
  //TODO#4: Or uploaded in a single batch   
 ImageFileCreateBatch batch = null; //create a batch
-trainingApi.CreateImagesFromFilesWithHttpMessagesAsync(project.Id,batch).Wait();
+trainingApi.CreateImagesFromFiles(project.Id, batch);
 
 ```
 

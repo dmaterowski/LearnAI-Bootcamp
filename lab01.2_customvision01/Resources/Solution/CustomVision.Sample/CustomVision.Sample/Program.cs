@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Microsoft.Cognitive.CustomVision.Prediction;
-using Microsoft.Cognitive.CustomVision.Training;
-using Microsoft.Cognitive.CustomVision.Training.Models;
+using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Training.Models;
+using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Training;
+using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
 
 namespace CustomVision.Sample
 {
@@ -13,52 +13,50 @@ namespace CustomVision.Sample
     {
         private static List<MemoryStream> hemlockImages;
 
-        private static List<MemoryStream> japaneseCherryImages;
+        private static List<string> japaneseCherryImages;
 
         private static MemoryStream testImage;
 
         static void Main(string[] args)
         {
-            // You can either add your training key here, pass it on the command line, or type it in when the program runs
-            string trainingKey = "";
+            string trainingKey =
+                "<INSERT YOUR TRAINING KEY HERE>";
+            string trainingEndpoint = "<TRAINING URL>";
 
-            // Create the Api, passing in a credentials object that contains the training key
-            //TrainingApiCredentials trainingCredentials = new TrainingApiCredentials(trainingKey);
-            TrainingApi trainingApi = new TrainingApi();
-            trainingApi.ApiKey = trainingKey;
+            // Create the Api
+            CustomVisionTrainingClient trainingApi = new CustomVisionTrainingClient()
+            {
+                ApiKey = trainingKey,
+                Endpoint = trainingEndpoint
+            };
 
             // Create a new project  
             Console.WriteLine("Creating new project:");
-            var project = trainingApi.CreateProject("My First Project");
+            Project project = trainingApi.CreateProject("project-cherry-hemlock");
 
-            // Make two tags in the new project
-            var hemlockTag = trainingApi.CreateTag(project.Id, "Hemlock");
-            var japaneseCherryTag = trainingApi.CreateTag(project.Id, "Japanese Cherry");
+            //TODO#2: Make two tags in the new project
+            Tag hemlockTag = trainingApi.CreateTag(project.Id, "Hemlock"); //Create Tag "Hemlock";
+            Tag japaneseCherryTag = trainingApi.CreateTag(project.Id, "Japanese Cherry"); //Create Tag "Japanese Cherry"
 
             // Add some images to the tags  
-            Console.WriteLine("\\tUploading images");
+            Console.WriteLine("\tUploading images");
             LoadImagesFromDisk();
 
-            // Images can be uploaded one at a time  
+            //TODO#3: Images can be uploaded one at a time  
             foreach (var image in hemlockImages)
             {
                 trainingApi.CreateImagesFromData(project.Id, image, new List<string>() {hemlockTag.Id.ToString()});
             }
 
-            var entries = new List<ImageFileCreateEntry>();
-            int counter = 0;
-            foreach (var image in japaneseCherryImages)
-            {
-                var bytes = ReadFully(image);
-                entries.Add(new ImageFileCreateEntry($"japaneseCherry{counter++}", bytes));
-            }
-
-            // Or uploaded in a single batch   
-            ImageFileCreateBatch batch = new ImageFileCreateBatch(entries, new List<Guid>() {japaneseCherryTag.Id});
-            trainingApi.CreateImagesFromFilesWithHttpMessagesAsync(project.Id, batch).Wait();
+            //TODO#4: Or uploaded in a single batch   
+            var imageFiles = japaneseCherryImages
+                .Select(img => new ImageFileCreateEntry(Path.GetFileName(img), File.ReadAllBytes(img))).ToList();
+            trainingApi.CreateImagesFromFiles(project.Id,
+                new ImageFileCreateBatch(imageFiles, new List<Guid>() {japaneseCherryTag.Id}));
 
             // Now there are images with tags start training the project  
-            Console.WriteLine("\\tTraining");
+            Console.WriteLine("\tTraining");
+            //TODO#5: replace '_' below with a call to training method
             var iteration = trainingApi.TrainProject(project.Id);
 
             // The returned iteration will be in progress, and can be queried periodically to see when it has completed  
@@ -79,12 +77,15 @@ namespace CustomVision.Sample
 
             // Add your prediction key from the settings page of the portal 
             // The prediction key is used in place of the training key when making predictions 
-            string predictionKey = "";
+            string predictionKey = "<PREDICTION KEY>";
+            string predictionEndpoint = "<PREDICTION URL>";
 
-            // Create a prediction endpoint, passing in a prediction credentials object that contains the obtained prediction key  
-            //PredictionEndpointCredentials predictionEndpointCredentials = new PredictionEndpointCredentials(predictionKey);
-            PredictionEndpoint endpoint = new PredictionEndpoint();
-            endpoint.ApiKey = predictionKey;
+            // Create a prediction endpoint
+            CustomVisionPredictionClient endpoint = new CustomVisionPredictionClient()
+            {
+                ApiKey = predictionKey,
+                Endpoint = predictionEndpoint
+            };
             // Make a prediction against the new project  
             Console.WriteLine("Making a prediction:");
             var result = endpoint.PredictImage(project.Id, testImage);
@@ -92,38 +93,21 @@ namespace CustomVision.Sample
             // Loop over each prediction and write out the results  
             foreach (var c in result.Predictions)
             {
-                Console.WriteLine($"\t{c.Tag}: {c.Probability:P1}");
+                Console.WriteLine($"Tag: {c.TagName} - Probability:{c.Probability}");
             }
 
             Console.ReadKey();
 
         }
 
-        public static byte[] ReadFully(Stream input)
-        {
-            byte[] buffer = new byte[16 * 1024];
-            using (MemoryStream ms = new MemoryStream())
-            {
-                int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    ms.Write(buffer, 0, read);
-                }
-
-                return ms.ToArray();
-            }
-        }
-
         private static void LoadImagesFromDisk()
         {
             // this loads the images to be uploaded from disk into memory
-            hemlockImages = Directory.GetFiles(@"..\..\..\..\..\Images\Hemlock")
+            hemlockImages = Directory.GetFiles(@"..\..\..\..\..\..\Images\Hemlock")
                 .Select(f => new MemoryStream(File.ReadAllBytes(f))).ToList();
-            japaneseCherryImages = Directory.GetFiles(@"..\..\..\..\..\Images\Japanese Cherry")
-                .Select(f => new MemoryStream(File.ReadAllBytes(f))).ToList();
-            testImage = new MemoryStream(File.ReadAllBytes(@"..\..\..\..\..\Images\Test\test_image.jpg"));
+            japaneseCherryImages = Directory.GetFiles(@"..\..\..\..\..\..\Images\Japanese Cherry").ToList();
+            testImage = new MemoryStream(File.ReadAllBytes(@"..\..\..\..\..\..\Images\Test\test_image.jpg"));
 
         }
     }
-
 }

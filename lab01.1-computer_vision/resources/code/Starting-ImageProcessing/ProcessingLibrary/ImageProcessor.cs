@@ -18,7 +18,6 @@ namespace ProcessingLibrary
 		// Step 5: Create an entry in ImageInsights:
         
 		// Step 6: Return results:
-        }
     }
 
 }
